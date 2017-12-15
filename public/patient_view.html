@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Uport Health Prototype</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="../../node_modules/web3/dist/web3.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script>
+    <style>
+        main { padding: 10px 30px; }
+        header { background: #EEE; }
+        .btn-sm{ padding: 3px 10px;
+            border-radius: 0; }
+    </style>
+</head>
+<body>
+<main>
+    <header><h1 id="appName">Uport Health Prototype</h1></header>
+    <hr/>
+    <section>
+        <h2>Connect uPort</h2>
+        <table>
+            <tbody>
+            <tr><td><span>uPort Id: </span><span id="uportId"></span></td></tr>
+            <tr><td><span>ETH Address: </span><span id="ethAddress"></span></td></tr>
+            <tr><td><span>ETH Balance: </span><span id="ethBalance"></span></td></tr>
+            <tr><td><span>Current Status: </span><span id="currentStatus"></span></td></tr>
+            </tbody>
+        </table>
+        <button class="btn btn-sm btn-primary" id="connectUportBtn" onclick="uportConnect()">Connect uPort</button>
+    </section>
+    <section>
+        <h2>Your personal health information</h2>
+        <h3>Patient information</h3>
+        <textarea id="patientInformation" readonly>
+            Benoit Rion
+        </textarea>
+        <h3>Medical treatments</h3>
+        <textarea id="medicalTreatments" readonly>
+            Ventolin 400
+        </textarea>
+    </section>
+    <hr/>
+    <section>
+        <h2>Who controls your personal health information</h2>
+        <input id="inputProfessional" placeholder="0x1234567891234567" type="text" onchange="addDoctor()">
+        <table id="listProfessionals">
+            <thead>
+            <tr>
+                <td><label>Name</label></td>
+                <td><label>Address</label></td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><label>Doctor X</label></td>
+                <td><label>0x1234567891234567</label>
+                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
+            </tr>
+            <tr>
+                <td><label>Doctor X</label></td>
+                <td><label>0x1234567891234567</label>
+                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
+            </tr>
+            <tr>
+                <td><label>Doctor X</label></td>
+                <td><label>0x1234567891234567</label>
+                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
+            </tr>
+            <tr>
+                <td><label>Doctor X</label></td>
+                <td><label>0x1234567891234567</label>
+                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<script>
+    // State and render functions
+
+    const $ = (selector) => document.querySelector(selector)
+    let globalState = {
+        uportId: "",
+        ethAddress: "",
+        ethBalance: "",
+        patientInformation: "",
+        medicalTreatments: "",
+        inputProfessional: "",
+        addedProfessional: "",
+        revokedProfessional: "",
+        listProfessionals: ""
+    }
+
+    const render = function () {
+        $('#uportId').innerHTML = globalState.uportId;
+        $('#ethAddress').innerHTML = globalState.ethAddress;
+        $('#ethBalance').innerHTML = globalState.ethBalance;
+        $('#patientInformation').innerHTML = globalState.patientInformation;
+        $('#medicalTreatments').innerHTML = globalState.medicalTreatments;
+        $('#inputProfessional').innerHTML = globalState.inputProfessional;
+        updateListProfessionals();
+    }
+
+    const updateState = function () {
+        globalState.inputProfessional = $('#inputProfessional').value;
+        console.log(globalState)
+    }
+
+    const updateListProfessionals = function () {
+        console.log('Updated list');
+        var table = ""
+        $('#listProfessionals').find('tbody').append(item)
+    }
+
+</script>
+<script type="text/javascript" src="uport_health.js"></script>
+</body>
+</html>

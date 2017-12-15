@@ -1,0 +1,39 @@
+textarea {
+    overflow-y: scroll;
+    font-size: 14px;
+    resize: none;
+    width: 350px;
+    height: 200px;
+
+}
+
+.btn-delete {
+    background-color: red;
+    border-radius: 15px !important;
+    color: white;
+    margin: 0.5em;
+}
+.btn-delete:hover {
+    background-color: darkred;
+    color: white;
+}
+
+#listProfessionals {
+    width: 350px;
+    overflow-y:scroll;
+    height:200px;
+    display: block;
+}
+
+#listProfessionals label {
+    margin: 0.5em;
+}
+
+
+#listProfessionals td:first-child {
+    width: 150px;
+}
+
+#inputProfessional {
+    width: 350px;
+}
