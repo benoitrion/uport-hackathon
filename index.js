@@ -10,6 +10,10 @@ app.get('/', function(request, response) {
 
 });
 
+app.get('/test', function(request, response) {
+    response.sendFile(path.join(__dirname+'/public/NotSoSimpleStorage.html'));
+});
+
 app.get('/patient', function(request, response) {
     response.sendFile(path.join(__dirname+'/public/patient_view.html'));
 });
