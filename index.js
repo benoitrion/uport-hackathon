@@ -14,6 +14,10 @@ app.get('/test', function(request, response) {
     response.sendFile(path.join(__dirname+'/public/NotSoSimpleStorage.html'));
 });
 
+app.get('/test2', function(request, response) {
+    response.sendFile(path.join(__dirname+'/public/test2.html'));
+});
+
 app.get('/patient', function(request, response) {
     response.sendFile(path.join(__dirname+'/public/patient_view.html'));
 });

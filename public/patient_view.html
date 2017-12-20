@@ -8,9 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
-    <script type="text/javascript" src="web3/web3.min.js"></script>
-    <script type="text/javascript" src="ipfs/ipfs.js"></script>
-    <script type="text/javascript" src="../../node_modules/uport-connect/dist/uport-connect.js"></script>
     <style>
         main { padding: 10px 30px; }
         header { background: #EEE; }
@@ -35,20 +32,19 @@
         <button class="btn btn-sm btn-primary" id="connectUportBtn" onclick="uportConnect()">Connect uPort</button>
     </section>
     <section>
-        <h2>Your personal health information</h2>
-        <h3>Patient information</h3>
-        <textarea id="patientInformation" readonly>
-            Benoit Rion
-        </textarea>
-        <h3>Medical treatments</h3>
-        <textarea id="medicalTreatments" readonly>
-            Ventolin 400
-        </textarea>
+        <h2>Your medical history</h2>
+        <label class="btn btn-info btn-file" onclick="upload()">
+            Select File <input type="file" name="file-upload" style="display: none;" multiple>
+        </label>
+        <a id="url"></a>
+        </br>
+        </br>
+        <img id="output">
     </section>
     <hr/>
     <section>
         <h2>Who controls your personal health information</h2>
-        <input id="inputProfessional" placeholder="0x1234567891234567" type="text" onchange="addDoctor()">
+        <input id="inputProfessional" placeholder="0x1234567891234567" type="text" onkeypress="addDoctor(event)">
         <table id="listProfessionals">
             <thead>
             <tr>
@@ -59,42 +55,29 @@
             <tbody>
             <tr>
                 <td><label>Doctor X</label></td>
-                <td><label>0x1234567891234567</label>
-                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
-            </tr>
-            <tr>
-                <td><label>Doctor X</label></td>
-                <td><label>0x1234567891234567</label>
-                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
-            </tr>
-            <tr>
-                <td><label>Doctor X</label></td>
-                <td><label>0x1234567891234567</label>
-                <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
-            </tr>
-            <tr>
-                <td><label>Doctor X</label></td>
-                <td><label>0x1234567891234567</label>
+                <td><label>0x1234567891234561</label>
                 <td><button class="btn btn-sm btn-delete" onclick="removeDoctor()">x</button></td>
             </tr>
             </tbody>
         </table>
     </section>
 </main>
+<script type="text/javascript" src="web3/web3.min.js"></script>
+<script type="text/javascript" src="ipfs/ipfs.js"></script>
+<script type="text/javascript" src="https://unpkg.com/uport-connect/dist/uport-connect.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://wzrd.in/standalone/buffer"></script>
+<script type="text/javascript" src="uport_health.js"></script>
 <script>
     // State and render functions
 
-    const $ = (selector) => document.querySelector(selector)
     let globalState = {
         uportId: "",
         ethAddress: "",
         ethBalance: "",
         patientInformation: "",
         medicalTreatments: "",
-        inputProfessional: "",
-        addedProfessional: "",
-        revokedProfessional: "",
-        listProfessionals: ""
+        medicalHistoryHash: ""
     }
 
     const render = function () {
@@ -103,22 +86,87 @@
         $('#ethBalance').innerHTML = globalState.ethBalance;
         $('#patientInformation').innerHTML = globalState.patientInformation;
         $('#medicalTreatments').innerHTML = globalState.medicalTreatments;
-        $('#inputProfessional').innerHTML = globalState.inputProfessional;
-        updateListProfessionals();
-    }
-
-    const updateState = function () {
-        globalState.inputProfessional = $('#inputProfessional').value;
-        console.log(globalState)
+        $('#medicalHistoryHash').innerHTML = globalState.medicalHistoryHash;
     }
 
     const updateListProfessionals = function () {
-        console.log('Updated list');
-        var table = ""
-        $('#listProfessionals').find('tbody').append(item)
+        console.log('Updating professionals list');
+
+        getProfessionalList(globalState.ethAddress)
+
+        professionalsList = globalState.listProfessionals
+        professionalsList.forEach(function(profi) {
+            const rowName = profi.name
+            const rowAddress = profi.address
+
+            addProfessionalListRow(rowName, rowAddress)
+        })
+
     }
 
+    // Add doctor to professionals list trigger a addAccess call
+    const addDoctor = function(event) {
+
+        console.log('Adding doctor')
+
+        if(event.which == 13) {
+            var docAddress = $('#inputProfessional').val()
+            $('#inputProfessional').val("");
+            //addAccess(docAddress)
+
+            console.log(globalState.addedProfessionalName)
+            console.log(globalState.addedProfessionalAddress)
+            /*
+             let rowName = globalState.addedProfessionalName
+             let rowAddress = globalState.addedProfessionalAddress
+            */
+            const rowName = "test"
+            const rowAddress = docAddress
+
+            addProfessionalListRow(rowName, rowAddress)
+
+        }
+    }
+
+    const addProfessionalListRow = function(name, address) {
+        let listProfessionals = $('#listProfessionals')
+
+        let tRow = ""
+        tRow += "<tr>"
+        tRow += "<td><label>" + name + "</label></td>"
+        tRow += "<td><label>" + address + "</label></td>"
+        tRow += "<td><button class=\"btn btn-sm btn-delete\" onclick=\"removeDoctor()\">x</button></td>"
+        tRow += "</tr>"
+
+        listProfessionals.find('tbody').append(tRow)
+    }
+
+    // Remove doctor from professionals list and trigger a revokeAccess call
+    const removeDoctor = function() {
+        console.log('Removing doctor')
+        console.log($(this).text())
+        console.log(this)
+        // Get address from row and compare
+
+/*        let $row = $(this).closest('tr')
+        console.log(this)
+        console.log($(this).closest('tr'))
+        let $address = $(row).find('td:nth-child(2)')
+        let revokedAddress = $address.val()
+
+        //revokeAccess(revokedAddress)
+        if (globalState.revokedProfessionalAddress == revokedAddress) {
+            $(this).closest("tr").remove();
+        }
+        $(this).closest('tr').remove();*/
+
+
+    }
+    $(".btn-delete").click(function() {/*
+        console.log($(this).text())
+        console.log(this)
+        $(this).parents('tr').remove();*/
+    });
 </script>
-<script type="text/javascript" src="uport_health.js"></script>
 </body>
 </html>
